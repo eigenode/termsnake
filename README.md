@@ -27,7 +27,7 @@ It features smooth movement, Unicode graphics, and polished win/loss screens.
 
 > *Coming soon — gameplay GIF here!*
 
-![Gameplay Preview](assets/snake-demo.gif)
+![Gameplay Preview](tsnake.gif)
 
 ## Build & Run
 
