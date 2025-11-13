@@ -8,7 +8,9 @@
 
 #define WIDTH 30
 #define HEIGHT 15
-#define MAX_SNAKE 100
+#define MAX_SNAKE 200
+
+typedef enum { PLAYING, WON, LOST } GameState;
 
 typedef enum { UP, DOWN, LEFT, RIGHT } Direction;
 
@@ -69,10 +71,10 @@ int read_key() {
 }
 
 // ===== Game Drawing =====
-void draw(Snake *snake, Food *food) {
-    printf("\033[H"); // move cursor to top-left
+void draw(Snake *snake, Food *food, GameState state) {  
+  printf("\033[H"); // move cursor to top-left
 
-    for (int y = 0; y < HEIGHT; y++) {
+  for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             // Borders
             if (y == 0 && x == 0) { printf("┌"); continue; }
@@ -83,7 +85,7 @@ void draw(Snake *snake, Food *food) {
             if (x == 0 || x == WIDTH - 1) { printf("│"); continue; }
 
             // Food
-            if (x == food->x && y == food->y) {
+            if (state == PLAYING && x == food->x && y == food->y) {
                 printf("\033[31m●\033[0m");
                 continue;
             }
@@ -177,7 +179,7 @@ int main(void) {
 
     printf("\033[2J");   // Clear screen
     printf("\033[?25l"); // Hide cursor
-
+    GameState state = PLAYING;
     Snake snake = {{WIDTH / 2}, {HEIGHT / 2}, 3, RIGHT};
     for (int i = 1; i < snake.length; i++) {
         snake.x[i] = snake.x[0] - i;
@@ -186,20 +188,42 @@ int main(void) {
 
     Food food;
     place_food(&snake, &food);
-
+    
     while (1) {
-        draw(&snake, &food);
-        handle_input(&snake);
-        update(&snake, &food);
+        draw(&snake, &food, state);
 
-        if (collision(&snake)) {
-            printf("\033[H\033[2JGame Over! Final score: %d\n", snake.length - 1);
-            break;
-        }
-
-        int speed = 180000 - (snake.length * 4000);
+        int speed = 150000 - (snake.length * 4000);
         if (speed < 40000) speed = 40000;
-        usleep(speed);
+
+        // --- Improved latency loop ---
+        int slice = 5000;               // 5 ms slices
+        int steps = speed / slice;      // How many times to poll input
+        for (int i = 0; i < steps; i++) {
+            handle_input(&snake);       // Poll input frequently
+            usleep(slice);              // Sleep a tiny bit
+        }
+        // -----------------------------
+
+        update(&snake, &food);
+	
+	// --- Check for win ---
+	if (snake.length >= MAX_SNAKE) {
+	  state = WON;
+	  draw(&snake, &food, state);
+	  printf("\033[%d;1H", HEIGHT + 1);
+	  printf("\033[32m🎉 You Win! Final score: %d 🎉\033[0m\n", snake.length - 1);
+	  break;
+	}
+
+	// --- Check for loss ---
+        if (collision(&snake)) {
+	  state = LOST;
+	  draw(&snake, &food, state);
+	  // Move cursor just below the board (HEIGHT + 2 lines from top)
+	  printf("\033[%d;1H", HEIGHT + 1);
+	  printf("💀 Game Over! Final score: %d\n", snake.length - 1);
+	  break; 
+        }
     }
 
     printf("\033[?25h"); // Show cursor again
