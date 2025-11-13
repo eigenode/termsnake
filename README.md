@@ -25,9 +25,9 @@ It features smooth movement, Unicode graphics, and polished win/loss screens.
 
 ## Gameplay Preview
 
-> *Coming soon — gameplay GIF here!*
-
-![Gameplay Preview](tsnake.gif)
+<p align="center">
+  <img src="tsnake.gif" alt="Snake gameplay preview" style="width: 80%; height: auto;">
+</p>
 
 ## Build & Run
 
