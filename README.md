@@ -62,7 +62,7 @@ make run
 
 - 💾 High score tracking: Store and display top scores locally.
 
--🌈 Enhanced visuals: Optional animations or gradient colors for the snake.
+- 🌈 Enhanced visuals: Optional animations or gradient colors for the snake.
 
 - 🔊 Simple sound effects (optional): Basic terminal sounds for movement and scoring.
 
