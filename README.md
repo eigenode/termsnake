@@ -16,7 +16,7 @@ It features smooth movement, Unicode graphics, and polished win/loss screens.
 ## Controls
 
 | Key  | Action      |
-|||
+|------|------------|
 | ↑    | Move Up    |
 | ↓    | Move Down  |
 | ←    | Move Left  |
